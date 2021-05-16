@@ -1,0 +1,20 @@
+_base_ = 'htc_swin_base.py'
+model = dict(
+    pretrained='pretrained/swin_tiny_patch4_window7_224.pth',
+    roi_head=dict(
+        semantic_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[8]),
+        semantic_head=dict(
+            type='FusedSemanticHead',
+            num_ins=5,
+            fusion_level=1,
+            num_convs=4,
+            in_channels=256,
+            conv_out_channels=256,
+            num_classes=183,
+            ignore_label=255,
+            loss_weight=0.2)))
+work_dir = 'work_dirs/swin_zzy/htc_swin_tiny_3x'

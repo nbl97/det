@@ -86,8 +86,7 @@ def parse_args():
 def main():
     args = parse_args()
     cfg = Config.fromfile(args.config)
-    import pdb
-    pdb.set_trace()
+
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
     # import modules from string list.

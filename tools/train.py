@@ -68,6 +68,7 @@ def parse_args():
         default='pytorch',
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+    
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -86,7 +87,6 @@ def parse_args():
 def main():
     args = parse_args()
     cfg = Config.fromfile(args.config)
-
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
     # import modules from string list.
@@ -117,8 +117,21 @@ def main():
         distributed = False
     else:
         distributed = True
-        init_dist(args.launcher, **cfg.dist_params)
+        if 'MASTER_ADDR' in os.environ and 'MASTER_PORT' in os.environ:
+            args.dist_url = 'tcp://' + os.environ['MASTER_ADDR'] + ":" + os.environ['MASTER_PORT']
+        # init_dist(args.launcher, **cfg.dist_params)
         # re-set gpu_ids with distributed training mode
+        args.rank = int(os.environ["RANK"])
+        args.world_size = int(os.environ['WORLD_SIZE'])
+        args.gpu = int(os.environ['LOCAL_RANK'])
+        
+        torch.cuda.set_device(args.gpu)
+        args.dist_backend = 'nccl'
+        print('| distributed init (rank {}): {}'.format(args.rank, args.dist_url), flush=True)
+        torch.distributed.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
+                                                world_size=args.world_size, rank=args.rank)
+        torch.distributed.barrier()
+
         _, world_size = get_dist_info()
         cfg.gpu_ids = range(world_size)
 

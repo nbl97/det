@@ -107,6 +107,7 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
                 prog_bar.update()
 
     # collect results from all ranks
+    gpu_collect = True
     if gpu_collect:
         results = collect_results_gpu(results, len(dataset))
     else:

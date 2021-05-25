@@ -138,4 +138,4 @@ optimizer_config = dict(
     bucket_size_mb=-1,
     use_fp16=True,
 )
-work_dir = '/mnt/configblob/users/bolin/b14_det_3x_16gpu'
+work_dir = '/mnt/configblob/users/bolin/b14_det_3x_16gpu/'

@@ -11,7 +11,7 @@ model = dict(
         num_heads=[3, 6, 12, 24],
         window_size=7,
         ape=False,
-        drop_path_rate=0.2,
+        drop_path_rate=0.3,
         patch_norm=True,
         use_checkpoint=False
     ),
@@ -138,3 +138,4 @@ optimizer_config = dict(
     bucket_size_mb=-1,
     use_fp16=True,
 )
+work_dir = '/mnt/configblob/users/bolin/s22302_det3x_dp4_16gpu/'

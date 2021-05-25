@@ -262,11 +262,12 @@ class PatchMerging(nn.Module):
         dim (int): Number of input channels.
         norm_layer (nn.Module, optional): Normalization layer.  Default: nn.LayerNorm
     """
-    def __init__(self, dim, norm_layer=nn.LayerNorm):
+    def __init__(self, in_dim, out_dim, norm_layer=nn.LayerNorm):
         super().__init__()
-        self.dim = dim
-        self.reduction = nn.Linear(4 * dim, 2 * dim, bias=False)
-        self.norm = norm_layer(4 * dim)
+        self.in_dim = in_dim
+        self.out_dim = out_dim
+        self.reduction = nn.Linear(4 * in_dim, out_dim, bias=False)
+        self.norm = norm_layer(4 * in_dim)
 
     def forward(self, x, H, W):
         """ Forward function.
@@ -355,7 +356,11 @@ class BasicLayer(nn.Module):
 
         # patch merging layer
         if downsample is not None:
-            self.downsample = downsample(dim=dim, norm_layer=norm_layer)
+            # self.downsample = downsample(dim=dim, norm_layer=norm_layer)
+            if dim != 192:
+                self.downsample = downsample(in_dim=dim, out_dim=2*dim, norm_layer=norm_layer)
+            else:
+                self.downsample = downsample(in_dim=dim, out_dim=512, norm_layer=norm_layer)
         else:
             self.downsample = None
 
@@ -525,13 +530,15 @@ class SwinTransformer(nn.Module):
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
 
         # build layers
+        num_features = [96, 192, 512, 1024]
         self.layers = nn.ModuleList()
         for i_layer in range(self.num_layers):
             layer = BasicLayer(
-                dim=int(embed_dim * 2 ** i_layer),
+                # dim=int(embed_dim * 2 ** i_layer),
+                dim = num_features[i_layer],
                 depth=depths[i_layer],
                 num_heads=num_heads[i_layer],
-                window_size=window_size if i_layer != 2 else 14,
+                window_size=window_size if i_layer != 3 else 7,
                 mlp_ratio=mlp_ratio,
                 qkv_bias=qkv_bias,
                 qk_scale=qk_scale,
@@ -543,7 +550,7 @@ class SwinTransformer(nn.Module):
                 use_checkpoint=use_checkpoint)
             self.layers.append(layer)
 
-        num_features = [int(embed_dim * 2 ** i) for i in range(self.num_layers)]
+        # num_features = [int(embed_dim * 2 ** i) for i in range(self.num_layers)]
         self.num_features = num_features
 
         # add a norm layer for each output

@@ -6,16 +6,16 @@ _base_ = [
 
 model = dict(
     backbone=dict(
-        embed_dim=128,
+        embed_dim=96,
         depths=[2, 2, 18, 2],
-        num_heads=[4, 8, 16, 32],
-        window_size=7,
+        num_heads=[3, 6, 16, 32],
+        window_size=14,
         ape=False,
         drop_path_rate=0.3,
         patch_norm=True,
         use_checkpoint=False
     ),
-    neck=dict(in_channels=[128, 256, 512, 1024]),
+    neck=dict(in_channels=[96, 192, 512, 1024]),
     roi_head=dict(
         bbox_head=[
             dict(
@@ -121,7 +121,7 @@ train_pipeline = [
 ]
 data = dict(train=dict(pipeline=train_pipeline))
 
-optimizer = dict(_delete_=True, type='AdamW', lr=0.0001, betas=(0.9, 0.999), weight_decay=0.05,
+optimizer = dict(_delete_=True, type='AdamW', lr=0.0002, betas=(0.9, 0.999), weight_decay=0.05,
                  paramwise_cfg=dict(custom_keys={'absolute_pos_embed': dict(decay_mult=0.),
                                                  'relative_position_bias_table': dict(decay_mult=0.),
                                                  'norm': dict(decay_mult=0.)}))
@@ -138,3 +138,4 @@ optimizer_config = dict(
     bucket_size_mb=-1,
     use_fp16=True,
 )
+work_dir = '/mnt/configblob/users/bolin/b14_det_3x_16gpu'

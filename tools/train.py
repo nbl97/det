@@ -135,10 +135,14 @@ def main():
             raise ValueError('valid or empty platform.')
         # init_dist(args.launcher, **cfg.dist_params)
         # re-set gpu_ids with distributed training mode
-        args.rank = int(os.environ["RANK"])
-        args.world_size = int(os.environ['WORLD_SIZE'])
-        args.gpu = int(os.environ['LOCAL_RANK'])
-        
+        if 'OMPI_COMM_WORLD_RANK' in os.environ:
+            args.rank = int(os.environ.get('OMPI_COMM_WORLD_RANK'))
+            args.world_size = int(os.environ.get('OMPI_COMM_WORLD_SIZE'))
+            args.gpu = args.rank % torch.cuda.device_count()
+        elif 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
+            args.rank = int(os.environ["RANK"])
+            args.world_size = int(os.environ['WORLD_SIZE'])
+            args.gpu = int(os.environ['LOCAL_RANK'])
         torch.cuda.set_device(args.gpu)
         args.dist_backend = 'nccl'
         print('| distributed init (rank {}): {}'.format(args.rank, args.dist_url), flush=True)

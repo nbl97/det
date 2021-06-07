@@ -43,7 +43,6 @@ def window_partition(x, window_size):
     Args:
         x: (B, H, W, C)
         window_size (int): window size
-
     Returns:
         windows: (num_windows*B, window_size, window_size, C)
     """
@@ -60,7 +59,6 @@ def window_reverse(windows, window_size, H, W):
         window_size (int): Window size
         H (int): Height of image
         W (int): Width of image
-
     Returns:
         x: (B, H, W, C)
     """
@@ -73,7 +71,6 @@ def window_reverse(windows, window_size, H, W):
 class WindowAttention(nn.Module):
     """ Window based multi-head self attention (W-MSA) module with relative position bias.
     It supports both of shifted and non-shifted window.
-
     Args:
         dim (int): Number of input channels.
         window_size (tuple[int]): The height and width of the window.
@@ -120,7 +117,6 @@ class WindowAttention(nn.Module):
 
     def forward(self, x, mask=None):
         """ Forward function.
-
         Args:
             x: input features with shape of (num_windows*B, N, C)
             mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
@@ -155,7 +151,6 @@ class WindowAttention(nn.Module):
 
 class SwinTransformerBlock(nn.Module):
     """ Swin Transformer Block.
-
     Args:
         dim (int): Number of input channels.
         num_heads (int): Number of attention heads.
@@ -197,7 +192,6 @@ class SwinTransformerBlock(nn.Module):
 
     def forward(self, x, mask_matrix):
         """ Forward function.
-
         Args:
             x: Input feature, tensor size (B, H*W, C).
             H, W: Spatial resolution of the input feature.
@@ -257,7 +251,6 @@ class SwinTransformerBlock(nn.Module):
 
 class PatchMerging(nn.Module):
     """ Patch Merging Layer
-
     Args:
         dim (int): Number of input channels.
         norm_layer (nn.Module, optional): Normalization layer.  Default: nn.LayerNorm
@@ -270,7 +263,6 @@ class PatchMerging(nn.Module):
 
     def forward(self, x, H, W):
         """ Forward function.
-
         Args:
             x: Input feature, tensor size (B, H*W, C).
             H, W: Spatial resolution of the input feature.
@@ -300,7 +292,6 @@ class PatchMerging(nn.Module):
 
 class BasicLayer(nn.Module):
     """ A basic Swin Transformer layer for one stage.
-
     Args:
         dim (int): Number of feature channels
         depth (int): Depths of this stage.
@@ -361,7 +352,6 @@ class BasicLayer(nn.Module):
 
     def forward(self, x, H, W):
         """ Forward function.
-
         Args:
             x: Input feature, tensor size (B, H*W, C).
             H, W: Spatial resolution of the input feature.
@@ -404,7 +394,6 @@ class BasicLayer(nn.Module):
 
 class PatchEmbed(nn.Module):
     """ Image to Patch Embedding
-
     Args:
         patch_size (int): Patch token size. Default: 4.
         in_chans (int): Number of input image channels. Default: 3.
@@ -450,7 +439,6 @@ class SwinTransformer(nn.Module):
     """ Swin Transformer backbone.
         A PyTorch impl of : `Swin Transformer: Hierarchical Vision Transformer using Shifted Windows`  -
           https://arxiv.org/pdf/2103.14030
-
     Args:
         pretrain_img_size (int): Input image size for training the pretrained model,
             used in absolute postion embedding. Default 224.
@@ -573,7 +561,6 @@ class SwinTransformer(nn.Module):
 
     def init_weights(self, pretrained=None):
         """Initialize the weights in backbone.
-
         Args:
             pretrained (str, optional): Path to pre-trained weights.
                 Defaults to None.

@@ -1,5 +1,6 @@
 import argparse
 import copy
+from logging import raiseExceptions
 import os
 import os.path as osp
 import time
@@ -68,6 +69,8 @@ def parse_args():
         default='pytorch',
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+    parser.add_argument('--data-root', type=str, default=None)
+    parser.add_argument('--platform', type=str, default='pai')
     
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
@@ -87,6 +90,12 @@ def parse_args():
 def main():
     args = parse_args()
     cfg = Config.fromfile(args.config)
+    if args.platform == 'itp':
+        cfg.data.train['ann_file'] = args.data_root + 'annotations/instances_train2017.json'
+        cfg.data.train['img_prefix'] = args.data_root + 'train2017/'
+        cfg.data.test['ann_file'] = cfg.data.val['ann_file'] = args.data_root + 'annotations/instances_val2017.json'
+        cfg.data.test['ann_file'] = cfg.data.val['img_prefix'] = args.data_root + 'val2017/'
+
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
     # import modules from string list.
@@ -117,8 +126,13 @@ def main():
         distributed = False
     else:
         distributed = True
-        if 'MASTER_ADDR' in os.environ and 'MASTER_PORT' in os.environ:
-            args.dist_url = 'tcp://' + os.environ['MASTER_ADDR'] + ":" + os.environ['MASTER_PORT']
+        if args.platform == 'pai':
+            if 'MASTER_ADDR' in os.environ and 'MASTER_PORT' in os.environ:
+                args.dist_url = 'tcp://' + os.environ['MASTER_ADDR'] + ":" + os.environ['MASTER_PORT']
+        elif args.platform == 'itp':
+            args.dist_url  = 'tcp://' + os.environ['AZ_BATCH_MASTER_NODE'] + ":" + '23452'
+        else:
+            raise ValueError('valid or empty platform.')
         # init_dist(args.launcher, **cfg.dist_params)
         # re-set gpu_ids with distributed training mode
         args.rank = int(os.environ["RANK"])

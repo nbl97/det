@@ -138,4 +138,3 @@ optimizer_config = dict(
     bucket_size_mb=-1,
     use_fp16=True,
 )
-work_dir = '/mnt/configblob/users/bolin/tiny77147det1x'

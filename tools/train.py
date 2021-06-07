@@ -91,10 +91,10 @@ def main():
     args = parse_args()
     cfg = Config.fromfile(args.config)
     if args.platform == 'itp':
-        cfg.data.train['ann_file'] = args.data_root + 'annotations/instances_train2017.json'
-        cfg.data.train['img_prefix'] = args.data_root + 'train2017/'
-        cfg.data.test['ann_file'] = cfg.data.val['ann_file'] = args.data_root + 'annotations/instances_val2017.json'
-        cfg.data.test['ann_file'] = cfg.data.val['img_prefix'] = args.data_root + 'val2017/'
+        cfg.data.train['ann_file'] = args.data_root + '/annotations/instances_train2017.json'
+        cfg.data.train['img_prefix'] = args.data_root + '/train2017/'
+        cfg.data.test['ann_file'] = cfg.data.val['ann_file'] = args.data_root + '/annotations/instances_val2017.json'
+        cfg.data.test['ann_file'] = cfg.data.val['img_prefix'] = args.data_root + '/val2017/'
 
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)

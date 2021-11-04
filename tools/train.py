@@ -126,30 +126,8 @@ def main():
         distributed = False
     else:
         distributed = True
-        if args.platform == 'pai':
-            if 'MASTER_ADDR' in os.environ and 'MASTER_PORT' in os.environ:
-                args.dist_url = 'tcp://' + os.environ['MASTER_ADDR'] + ":" + os.environ['MASTER_PORT']
-        elif args.platform == 'itp':
-            args.dist_url  = 'tcp://' + os.environ['AZ_BATCH_MASTER_NODE'] + ":" + '23452'
-        else:
-            raise ValueError('valid or empty platform.')
-        # init_dist(args.launcher, **cfg.dist_params)
+        init_dist(args.launcher, **cfg.dist_params)
         # re-set gpu_ids with distributed training mode
-        if 'OMPI_COMM_WORLD_RANK' in os.environ:
-            args.rank = int(os.environ.get('OMPI_COMM_WORLD_RANK'))
-            args.world_size = int(os.environ.get('OMPI_COMM_WORLD_SIZE'))
-            args.gpu = args.rank % torch.cuda.device_count()
-        elif 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
-            args.rank = int(os.environ["RANK"])
-            args.world_size = int(os.environ['WORLD_SIZE'])
-            args.gpu = int(os.environ['LOCAL_RANK'])
-        torch.cuda.set_device(args.gpu)
-        args.dist_backend = 'nccl'
-        print('| distributed init (rank {}): {}'.format(args.rank, args.dist_url), flush=True)
-        torch.distributed.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
-                                                world_size=args.world_size, rank=args.rank)
-        torch.distributed.barrier()
-
         _, world_size = get_dist_info()
         cfg.gpu_ids = range(world_size)
 
